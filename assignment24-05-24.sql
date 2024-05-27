@@ -60,28 +60,17 @@ insert into erothrow values(1,'vvsvsv'),(2,'esbdbdddb');
 select*from erothrow;
 select emo_id,srido from erothrow
 --creating a fuction to throw spefic error message(...pending)
-CREATE FUNCTION dbo.Rerrorf2(@error varchar(20))
-RETURNS varchar(20)
-AS
-BEGIN
-    raiseerror(N'Access to this column is prohibited.',15,1);
-    
-END
-create table erothrow2(
-emo_id1 int,
-srido1 varchar(20),
-error1 as dbo.Rerrorf1(srido1))
-insert into erothrow2 values(1,'vvsvsv'),(2,'esbdbdddb');
-select * from erothrow2;
-go
---Display Calendar Table based on the input year.
-DECLARE @StartDate date = '20170101';
-DECLARE @CutoffDate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));
 
+   
+--Display Calendar Table based on the input year.
+DECLARE @StartDate date = '20240101';
+DECLARE @enddate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));
+ 
+ 
 WITH das(n) AS 
 (
   SELECT 0 UNION ALL SELECT n + 1 FROM das
-  WHERE n < DATEDIFF(DAY, @StartDate, @CutoffDate)
+  WHERE n < DATEDIFF(DAY, @StartDate, @enddate)
 ),
 sequendateadd(d) AS 
 (
@@ -90,21 +79,21 @@ sequendateadd(d) AS
 src AS
 (
   SELECT
-    TheDate         = CONVERT(date, d),
-    TheDay          = DATEPART(DAY,       d),
+    theDate         = CONVERT(date, d),
+	TheDayOfYear    = cast(DATEPART(DAYOFYEAR, d)as varchar)+'-'+cast(datepart(DAYOFYEAR,@enddate)AS varchar),
+    TheDay          = cast(DATEPART(DAY,d)as varchar)+'-'+cast(datepart(day,eomonth(d))as varchar),
     TheDayName      = DATENAME(WEEKDAY,   d),
-    TheWeek         = DATEPART(WEEK,      d),
-    TheISOWeek      = DATEPART(ISO_WEEK,  d),
-    TheDayOfWeek    = DATEPART(WEEKDAY,   d),
-    TheMonth        = DATEPART(MONTH,     d),
-    TheMonthName    = DATENAME(MONTH,     d),
-    TheQuarter      = DATEPART(Quarter,   d),
-    TheYear         = DATEPART(YEAR,      d),
+    TheWeek         = cast(DATEPART(WEEK,d)as varchar)+'-'+cast(DATEPART(WEEK,@enddate) as varchar),
+    TheDayOfWeek    = cast(DATEPART(WEEKDAY,d)as varchar)+' - 7',
+    TheMonth        = cast(DATEPART(MONTH,d)as varchar)+'-'+cast(DATEPART(month,@enddate) as varchar),
+    TheMonthName    = DATENAME(MONTH,d),
+    TheQuarter      = DATEPART(Quarter,d),
+    TheYear         = DATEPART(YEAR,d),
     TheFirstOfMonth = DATEFROMPARTS(YEAR(d), MONTH(d), 1),
-    TheLastOfYear   = DATEFROMPARTS(YEAR(d), 12, 31),
-    TheDayOfYear    = DATEPART(DAYOFYEAR, d)
+    TheLastOfYear   = DATEFROMPARTS(YEAR(d), 12, 31)
   FROM sequendateadd
 )
+
 SELECT * FROM src
   ORDER BY TheDate
   OPTION (MAXRECURSION 0);
