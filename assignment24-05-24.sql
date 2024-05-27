@@ -1,27 +1,22 @@
+use EMPID#266
+drop function dbo.udf_GetNumeric
 CREATE FUNCTION dbo.udf_GetNumeric
 (@strAlphaNumeric VARCHAR(256))
 RETURNS VARCHAR(256)
 AS
 BEGIN
-    DECLARE @intAlpha INT
-    SET @intAlpha = PATINDEX('%[^0-9]%', @strAlphaNumeric)
-    
-    WHILE @intAlpha > 0
-    BEGIN
-        PRINT 'Iteration Start:'
-        PRINT '@intAlpha = ' + CAST(@intAlpha AS VARCHAR(10))
-        PRINT '@strAlphaNumeric = ''' + @strAlphaNumeric + ''''
-        
-        SET @strAlphaNumeric = STUFF(@strAlphaNumeric, @intAlpha, 1, '' )
-        SET @intAlpha = PATINDEX('%[^0-9]%', @strAlphaNumeric)
-        
-        PRINT '@strAlphaNumeric after removal = ''' + @strAlphaNumeric + ''''
-        PRINT 'Iteration End'
-    END
-    
-    RETURN ISNULL(@strAlphaNumeric,0)
+DECLARE @intAlpha INT
+SET @intAlpha = PATINDEX('%[^0-9]%', @strAlphaNumeric)
+BEGIN
+WHILE @intAlpha > 0
+BEGIN
+SET @strAlphaNumeric = STUFF(@strAlphaNumeric, @intAlpha, 1, '' )
+SET @intAlpha = PATINDEX('%[^0-9]%', @strAlphaNumeric )
 END
-GO 
+END
+RETURN ISNULL(@strAlphaNumeric,0)
+END
+GO
 SELECT dbo.udf_GetNumeric('asdf1234a1s2d3f4@@@')
 go
 -- Using substring
