@@ -1,6 +1,6 @@
 use EMPID#266
-drop function dbo.udf_GetNumeric
-CREATE FUNCTION dbo.udf_GetNumeric
+drop function get_num
+CREATE FUNCTION get_num
 (@strAlphaNumeric VARCHAR(256))
 RETURNS VARCHAR(256)
 AS
@@ -17,7 +17,7 @@ END
 RETURN ISNULL(@strAlphaNumeric,0)
 END
 GO
-SELECT dbo.udf_GetNumeric('asdf1234a1s2d3f4@@@')
+SELECT get_num('asdf1234a1s2d3f4@@@')
 go
 -- Using substring
 DECLARE @Ans VARCHAR(100) = 'A1B2C3D4E5F6'
@@ -55,13 +55,11 @@ insert into erothrow values(1,'vvsvsv'),(2,'esbdbdddb');
 select*from erothrow;
 select emo_id,srido from erothrow
 --creating a fuction to throw spefic error message(...pending)
-
+vvyuu
    
 --Display Calendar Table based on the input year.
 DECLARE @StartDate date = '20240101';
 DECLARE @enddate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));
- 
- 
 WITH das(n) AS 
 (
   SELECT 0 UNION ALL SELECT n + 1 FROM das
@@ -74,7 +72,7 @@ sequendateadd(d) AS
 src AS
 (
   SELECT
-    theDate         = CONVERT(date, d),
+    theDate         = CONVERT(date,d),
 	TheDayOfYear    = cast(DATEPART(DAYOFYEAR, d)as varchar)+'-'+cast(datepart(DAYOFYEAR,@enddate)AS varchar),
     TheDay          = cast(DATEPART(DAY,d)as varchar)+'-'+cast(datepart(day,eomonth(d))as varchar),
     TheDayName      = DATENAME(WEEKDAY,   d),
@@ -90,7 +88,7 @@ src AS
 )
 
 SELECT * FROM src
-  ORDER BY TheDate
+  ORDER BY theDate
   OPTION (MAXRECURSION 0);
 go
 --Display Emp and Manager Hierarchies based on the input till the topmost hierarchy.
