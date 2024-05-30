@@ -1,4 +1,6 @@
 use EMPID#266
+/*1)Select all departments in all locations where the Total Salary of a Department is Greater than twice the Average Salary for the department.
+And max basic for the department is at least thrice the Min basic for the department*/
 drop table employee;
 drop table departments;
 create table departments(
@@ -83,6 +85,7 @@ VALUES
 go
 insert into employee values
 (50,'rsdeddy',3,15000)
+go;
 select d.departmentname,d.branch,sum(e.salary),avg(e.salary)
 from departments as d 
 join employee as e 
@@ -91,3 +94,161 @@ group by d.departmentname,d.branch
 having sum(e.salary)>2*avg(e.salary) and 3*min(e.salary)<=max(e.salary)
 select * from departments
 select * from employee order by did;
+/*2)As per the companies rule if an employee has put up service of 1 Year 3 Months and 15 days in office, Then She/he would be eligible for a Bonus.
+the Bonus would be Paid on the first of the Next month after which a person has attained eligibility. Find out the eligibility date for all the employees. 
+And also find out the age of the Employee On the date of Payment of the First bonus. Display the Age in Years, Months, and Days.
+Also Display the weekday Name, week of the year, Day of the year and week of the month of the date on which the person has attained the eligibility*/
+CREATE TABLE Employees2 (
+  EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+  FirstName NVARCHAR(50) NOT NULL,
+  LastName NVARCHAR(50) NOT NULL,
+  BirthDate DATE NOT NULL,
+  HireDate DATE NOT NULL
+);
+INSERT INTO Employees2 (FirstName, LastName, BirthDate, HireDate)
+VALUES
+  ('John', 'Doe', '1990-01-01', '2018-01-01'),
+  ('Jane', 'Smith', '1992-06-15', '2019-03-01'),
+  ('Bob', 'Johnson', '1985-11-20', '2017-06-01'),
+  ('Alice', 'Williams', '1995-02-28', '2020-01-15'),
+  ('Mike', 'Brown', '1980-08-10', '2016-09-01');
+  --plese refer to my age calculation function query file from my repository for details on how agecal function works url'https://github.com/srinivasisomega/T-sql-assignments'
+WITH EmployeeData AS (
+  SELECT 
+    EmployeeID,
+    HireDate,
+    DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate))) AS EligibilityDate,
+    DATEDIFF(day, HireDate, DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate)))) AS DaysOfService
+  FROM 
+    Employees2
+)
+SELECT 
+  e.EmployeeID,
+  e.HireDate,
+  ed.EligibilityDate,
+  ed.DaysOfService,
+  DATEADD(day, 1, EOMONTH(ed.EligibilityDate)) AS BonusPaymentDate,
+  Age = dbo.agecal(e.BirthDate, DATEADD(day, 1, EOMONTH(ed.EligibilityDate))),
+  DATENAME(weekday, ed.EligibilityDate) AS EligibilityWeekday,
+  DATEPART(week, ed.EligibilityDate) AS EligibilityWeekOfYear,
+  DATEPART(dayofyear, ed.EligibilityDate) AS EligibilityDayOfYear,
+  DATEPART(week, ed.EligibilityDate) - DATEPART(week, DATEADD(month, DATEDIFF(month, 0, ed.EligibilityDate), 0)) + 1 AS EligibilityWeekOfMonth
+FROM 
+  Employees2 e
+  INNER JOIN EmployeeData ed ON e.EmployeeID = ed.EmployeeID
+WHERE 
+  ed.DaysOfService >= 455;
+/*3. Company Has decided to Pay a bonus to all its employees. The criteria is as follows
+1. Service Type 1. Employee Type 1. Minimum service is 10. Minimum service left should be 15 Years. Retirement age will be 60 Years
+2. Service Type 1. Employee Type 2. Minimum service is 12. Minimum service left should be 14 Years . Retirement age will be 55
+Years
+3. Service Type 1. Employee Type 3. Minimum service is 12. Minimum service left should be 12 Years . Retirement age will be 55
+Years
+3. for Service Type 2,3,4 Minimum Service should Be 15 and Minimum service left should be 20 Years . Retirement age will be 65
+Years
+Write a query to find out the employees who are eligible for the bonus.*/
+drop table bonus
+CREATE TABLE empking (
+id INT,
+name VARCHAR(50),
+servicetype VARCHAR(20),
+employeetype VARCHAR(20),
+dob DATE,
+doj DATE,
+CONSTRAINT chk_servicetype CHECK (servicetype IN ('Service Type 1', 'Service Type 2', 'Service Type 3', 'Service Type 4')),
+CONSTRAINT chk_employeetype CHECK (employeetype IN ('Employee Type 1', 'Employee Type 2', 'Employee Type 3'))
+);
+INSERT INTO empking(id, name, servicetype, employeetype, dob, doj)
+VALUES
+(1, 'John_Doe_ST1_ET1', 'Service Type 1', 'Employee Type 1', '1994-05-30', '2000-01-01'),
+(2, 'Jane_Smith_ST1_ET1', 'Service Type 1', 'Employee Type 1', '1989-10-15', '2020-06-15'),
+(3, 'Michael_Johnson_ST1_ET2', 'Service Type 1', 'Employee Type 2', '2000-02-20', '2000-01-01'),
+(4, 'Emily_Brown_ST1_ET2', 'Service Type 1', 'Employee Type 2', '1984-07-12', '2005-06-15'),
+(5, 'Daniel_Wilson_ST1_ET3', 'Service Type 1', 'Employee Type 3', '2009-09-10', '2011-01-01'),
+(6, 'Olivia_Miller_ST1_ET3', 'Service Type 1', 'Employee Type 3', '1994-12-25', '2005-06-15'),
+(7, 'William_Taylor_ST2_ET1', 'Service Type 2', 'Employee Type 1', '1959-05-20', '2000-01-01'),
+(8, 'Sophia_Anderson_ST2_ET1', 'Service Type 2', 'Employee Type 1', '1964-08-12', '2005-06-15'),
+(9, 'David_Thomas_ST2_ET2', 'Service Type 2', 'Employee Type 2', '1954-02-10', '2000-01-01'),
+(10, 'Isabella_Jackson_ST2_ET2', 'Service Type 2', 'Employee Type 2', '1959-07-25', '2005-06-15'),
+(11, 'James_Martin_ST2_ET3', 'Service Type 2', 'Employee Type 3', '1954-09-30', '2000-01-01'),
+(12, 'Mia_White_ST2_ET3', 'Service Type 2', 'Employee Type 3', '1959-12-15', '2005-06-15'),
+(13, 'Ethan_Hall_ST3_ET1', 'Service Type 3', 'Employee Type 1', '1959-05-20', '2000-01-01'),
+(14, 'Ava_Clark_ST3_ET1', 'Service Type 3', 'Employee Type 1', '1964-08-12', '2005-06-15'),
+(15, 'Noah_Allen_ST3_ET2', 'Service Type 3', 'Employee Type 2', '1954-02-10', '2000-01-01'),
+(16, 'Charlotte_Adams_ST3_ET2', 'Service Type 3', 'Employee Type 2', '1959-07-25', '2005-06-15'),
+(17, 'Liam_Wright_ST3_ET3', 'Service Type 3', 'Employee Type 3', '1954-09-30', '2000-01-01'),
+(18, 'Amelia_Harris_ST3_ET3', 'Service Type 3', 'Employee Type 3', '1959-12-15', '2005-06-15'),
+(19, 'ameliaportiagamera','Service Type 3','Employee Type 3','2003-06-06','2020-08-15');
+go
+WITH EligibleEmployees AS (
+SELECT name, servicetype, employeetype, dob, doj,
+DATEDIFF(YEAR, dob, GETDATE()) AS age,
+DATEDIFF(YEAR, doj, GETDATE()) AS years_of_service
+FROM empking
+)
+SELECT name,age
+FROM EligibleEmployees
+WHERE (servicetype = 'Service Type 1' AND ((employeetype = 'Employee Type 1' AND years_of_service >= 10 AND (60 - ABS(age)) >= 15) OR
+(employeetype = 'Employee Type 2' AND years_of_service >= 12 AND (55 - ABS(age)) >= 14) OR
+(employeetype = 'Employee Type 3' AND years_of_service >= 12 AND (55 - ABS(age)) >= 12)))OR
+(servicetype IN ('Service Type 2', 'Service Type 3', 'Service Type 4') AND years_of_service >= 15 AND (65 - ABS(age)) >= 20);
+go
+/*4.write a query to Get Max, Min and Average age of employees, service of employees by service Type , Service Status for each Centre(display in years and Months)*/
+create table employeedone(
+empid int,
+dob date,
+service int,
+center varchar(20)
+)
+insert into employeedone values
+(1,'2003-06-06',1,'hyd'),
+(2,'2000-06-06',1,'hyd'),
+(3,'2010-06-06',1,'ban'),
+(4,'2001-06-06',2,'hyd'),
+(5,'2006-06-06',2,'hyd'),
+(6,'1999-06-06',2,'ban'),
+(7,'1996-06-06',1,'ban'),
+(8,'2002-06-06',2,'hyd'),
+(9,'2003-01-06',2,'ban'),
+(10,'2005-06-06',1,'ban')
+SELECT 
+    center,service,
+    AVG(DATEDIFF(YEAR, dob, GETDATE())) AS avg_age,
+    MAX(DATEDIFF(YEAR, dob, GETDATE())) AS max_age,
+    MIN(DATEDIFF(YEAR, dob, GETDATE())) AS min_age
+FROM employeedone
+GROUP BY cube(service, center);
+
+SELECT 
+    service,
+    AVG(DATEDIFF(YEAR, dob, GETDATE())) AS avg_age,
+    MAX(DATEDIFF(YEAR, dob, GETDATE())) AS max_age,
+    MIN(DATEDIFF(YEAR, dob, GETDATE())) AS min_age
+FROM 
+    employeedone
+GROUP BY 
+    center;
+
+/*5)Write a query to list out all the employees where any of the words (Excluding Initials) in the Name starts and ends with the same
+character. (Assume there are not more than 5 words in any name )*/
+drop table employeename
+create table employeename(
+name varchar(30))
+insert into employeename VALUES ('A. Anna'),
+       ('A. Alan'),
+       ('A. Alice'),
+       ('A. Aaron'),
+       ('Ella'),
+       ('Ethan'),
+       ('Emma'),
+	   ('G.Ganag'),
+       ('n.Evan'),
+       ('Ava'),
+       ('A. Alex');
+SELECT name
+FROM employeename
+WHERE(
+(CHARINDEX(' ', TRIM(name)) > 0 AND LEFT(TRIM(name), 1) = RIGHT(TRIM(name), 1))
+OR 
+(CHARINDEX(' ', TRIM(name)) = 0 AND LEN(TRIM(name)) > 1 AND LEFT(TRIM(name), 1) = RIGHT(TRIM(name), 1))
+);
