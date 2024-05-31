@@ -99,45 +99,45 @@ the Bonus would be Paid on the first of the Next month after which a person has 
 And also find out the age of the Employee On the date of Payment of the First bonus. Display the Age in Years, Months, and Days.
 Also Display the weekday Name, week of the year, Day of the year and week of the month of the date on which the person has attained the eligibility*/
 CREATE TABLE Employees2 (
-  EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
-  FirstName NVARCHAR(50) NOT NULL,
-  LastName NVARCHAR(50) NOT NULL,
-  BirthDate DATE NOT NULL,
-  HireDate DATE NOT NULL
+EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+FirstName NVARCHAR(50) NOT NULL,
+LastName NVARCHAR(50) NOT NULL,
+BirthDate DATE NOT NULL,
+HireDate DATE NOT NULL
 );
 INSERT INTO Employees2 (FirstName, LastName, BirthDate, HireDate)
 VALUES
-  ('John', 'Doe', '1990-01-01', '2018-01-01'),
-  ('Jane', 'Smith', '1992-06-15', '2019-03-01'),
-  ('Bob', 'Johnson', '1985-11-20', '2017-06-01'),
-  ('Alice', 'Williams', '1995-02-28', '2020-01-15'),
-  ('Mike', 'Brown', '1980-08-10', '2016-09-01');
-  --plese refer to my age calculation function query file from my repository for details on how agecal function works url'https://github.com/srinivasisomega/T-sql-assignments'
+('John', 'Doe', '1990-01-01', '2018-01-01'),
+('Jane', 'Smith', '1992-06-15', '2019-03-01'),
+('Bob', 'Johnson', '1985-11-20', '2017-06-01'),
+('Alice', 'Williams', '1995-02-28', '2020-01-15'),
+('Mike', 'Brown', '1980-08-10', '2016-09-01');
+--plese refer to my age calculation function query file from my repository for details on how agecal function works url'https://github.com/srinivasisomega/T-sql-assignments'
 WITH EmployeeData AS (
-  SELECT 
-    EmployeeID,
-    HireDate,
-    DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate))) AS EligibilityDate,
-    DATEDIFF(day, HireDate, DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate)))) AS DaysOfService
-  FROM 
-    Employees2
+SELECT 
+EmployeeID,
+HireDate,
+DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate))) AS EligibilityDate,
+DATEDIFF(day, HireDate, DATEADD(day, 15, DATEADD(month, 3, DATEADD(year, 1, HireDate)))) AS DaysOfService
+FROM 
+Employees2
 )
 SELECT 
-  e.EmployeeID,
-  e.HireDate,
-  ed.EligibilityDate,
-  ed.DaysOfService,
-  DATEADD(day, 1, EOMONTH(ed.EligibilityDate)) AS BonusPaymentDate,
-  Age = dbo.agecal(e.BirthDate, DATEADD(day, 1, EOMONTH(ed.EligibilityDate))),
-  DATENAME(weekday, ed.EligibilityDate) AS EligibilityWeekday,
-  DATEPART(week, ed.EligibilityDate) AS EligibilityWeekOfYear,
-  DATEPART(dayofyear, ed.EligibilityDate) AS EligibilityDayOfYear,
-  DATEPART(week, ed.EligibilityDate) - DATEPART(week, DATEADD(month, DATEDIFF(month, 0, ed.EligibilityDate), 0)) + 1 AS EligibilityWeekOfMonth
+e.EmployeeID,
+e.HireDate,
+ed.EligibilityDate,
+ed.DaysOfService,
+DATEADD(day, 1, EOMONTH(ed.EligibilityDate)) AS BonusPaymentDate,
+Age = dbo.agecal(e.BirthDate, DATEADD(day, 1, EOMONTH(ed.EligibilityDate))),
+DATENAME(weekday, ed.EligibilityDate) AS EligibilityWeekday,
+DATEPART(week, ed.EligibilityDate) AS EligibilityWeekOfYear,
+DATEPART(dayofyear, ed.EligibilityDate) AS EligibilityDayOfYear,
+DATEPART(week, ed.EligibilityDate) - DATEPART(week, DATEADD(month, DATEDIFF(month, 0, ed.EligibilityDate), 0)) + 1 AS EligibilityWeekOfMonth
 FROM 
-  Employees2 e
-  INNER JOIN EmployeeData ed ON e.EmployeeID = ed.EmployeeID
+Employees2 e
+INNER JOIN EmployeeData ed ON e.EmployeeID = ed.EmployeeID
 WHERE 
-  ed.DaysOfService >= 455;
+ed.DaysOfService >= 455;
 /*3. Company Has decided to Pay a bonus to all its employees. The criteria is as follows
 1. Service Type 1. Employee Type 1. Minimum service is 10. Minimum service left should be 15 Years. Retirement age will be 60 Years
 2. Service Type 1. Employee Type 2. Minimum service is 12. Minimum service left should be 14 Years . Retirement age will be 55
@@ -194,6 +194,8 @@ WHERE (servicetype = 'Service Type 1' AND ((employeetype = 'Employee Type 1' AND
 (servicetype IN ('Service Type 2', 'Service Type 3', 'Service Type 4') AND years_of_service >= 15 AND (65 - ABS(age)) >= 20);
 go
 /*4.write a query to Get Max, Min and Average age of employees, service of employees by service Type , Service Status for each Centre(display in years and Months)*/
+alter table employees alter column Service_Type varchar(50) 
+alter table employees alter column  Service_status varchar(50)
 CREATE TABLE centers (
     Center_ID INT PRIMARY KEY,
     Center_Name VARCHAR(30)
@@ -222,29 +224,32 @@ INSERT INTO employees (Employee_ID, Center_ID, Date_of_Birth, Service_Type, Serv
 (6, 3, '1992-06-06','hr','Inactive');
 go;
 SELECT 
-    c.Center_Name,e.Service_Type,
-    e.Service_Status,
-    MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Max_Age_Years,
-    MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Min_Age_Years,
-    CONCAT(
-        CAST(MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
-        CAST(MAX(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
-    ) AS Max_Age,
-    CONCAT(
-        CAST(MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
-        CAST(MIN(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
-    ) AS Min_Age,
-    CONCAT(
-        CAST(ROUND(AVG(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())), 2) AS NVARCHAR(10)), ' years ',
-        CAST(ROUND(AVG(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12.0), 2) AS NVARCHAR(10)), ' months'
-    ) AS Avg_Age
+isnull(c.Center_Name,'center_total') as center,isnull(e.Service_Type,'service_total') as servicetype,
+isnull(e.Service_Status,'status_total') as status1,
+MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Max_Age_Years,
+MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Min_Age_Years,
+CONCAT(
+CAST(MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
+CAST(MAX(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
+) AS Max_Age,
+CONCAT(
+CAST(MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
+CAST(MIN(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
+) AS Min_Age,
+CONCAT(
+CAST(ROUND(AVG(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())), 2) AS NVARCHAR(10)), ' years ',
+CAST(ROUND(AVG(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12.0), 2) AS NVARCHAR(10)), ' months'
+) AS Avg_Age
    
 FROM 
-    employees e
+employees e
 JOIN 
-    centers c ON e.Center_ID = c.Center_ID
+centers c ON e.Center_ID = c.Center_ID
 GROUP BY 
-    cube(c.Center_Name, e.Service_Type, e.Service_Status);
+cube(c.Center_Name, e.Service_Type, e.Service_Status);
+/*having (c.Center_Name in ('center_total')  AND e.Service_Type in ('service_total') )
+    OR (c.Center_Name in ('center_total') and e.Service_Status in ( 'status_total') )
+    OR (e.Service_Type in ('status_total') AND e.Service_Status in ('service_total'));*/
 go
 
 /*5)Write a query to list out all the employees where any of the words (Excluding Initials) in the Name starts and ends with the same
@@ -253,16 +258,16 @@ drop table employeename
 create table employeename(
 name varchar(30))
 insert into employeename VALUES ('A. Anna'),
-       ('A. Alan'),
-       ('A. Alice'),
-       ('A. Aaron'),
-       ('Ella'),
-       ('Ethan'),
-       ('Emma'),
-	   ('G.Ganag'),
-       ('n.Evan'),
-       ('Ava'),
-       ('A. Alex');
+('A. Alan'),
+('A. Alice'),
+('A. Aaron'),
+('Ella'),
+('Ethan'),
+('Emma'),
+('G.Ganag'),
+('n.Evan'),
+('Ava'),
+('A. Alex');
 SELECT name
 FROM employeename
 WHERE(
