@@ -194,40 +194,58 @@ WHERE (servicetype = 'Service Type 1' AND ((employeetype = 'Employee Type 1' AND
 (servicetype IN ('Service Type 2', 'Service Type 3', 'Service Type 4') AND years_of_service >= 15 AND (65 - ABS(age)) >= 20);
 go
 /*4.write a query to Get Max, Min and Average age of employees, service of employees by service Type , Service Status for each Centre(display in years and Months)*/
-create table employeedone(
-empid int,
-dob date,
-service int,
-center varchar(20)
-)
-insert into employeedone values
-(1,'2003-06-06',1,'hyd'),
-(2,'2000-06-06',1,'hyd'),
-(3,'2010-06-06',1,'ban'),
-(4,'2001-06-06',2,'hyd'),
-(5,'2006-06-06',2,'hyd'),
-(6,'1999-06-06',2,'ban'),
-(7,'1996-06-06',1,'ban'),
-(8,'2002-06-06',2,'hyd'),
-(9,'2003-01-06',2,'ban'),
-(10,'2005-06-06',1,'ban')
-SELECT 
-    center,service,
-    AVG(DATEDIFF(YEAR, dob, GETDATE())) AS avg_age,
-    MAX(DATEDIFF(YEAR, dob, GETDATE())) AS max_age,
-    MIN(DATEDIFF(YEAR, dob, GETDATE())) AS min_age
-FROM employeedone
-GROUP BY cube(service, center);
+CREATE TABLE centers (
+    Center_ID INT PRIMARY KEY,
+    Center_Name VARCHAR(30)
+);
 
+CREATE TABLE employees (
+    Employee_ID INT PRIMARY KEY,
+    Center_ID INT,
+    Date_of_Birth DATE,
+    Service_Type VARCHAR(10),
+    Service_Status VARCHAR(20),
+    FOREIGN KEY (Center_ID) REFERENCES centers(Center_ID)
+);
+
+INSERT INTO centers (Center_ID, Center_Name) VALUES
+(1, 'hyderabad'),
+(2, 'bangalore'),
+(3, 'mumbai');
+
+INSERT INTO employees (Employee_ID, Center_ID, Date_of_Birth, Service_Type, Service_Status) VALUES
+(1, 1, '1990-05-15', 'delivery', 'Active'),
+(2, 1, '1985-10-20', 'hr', 'Inactive'),
+(3, 2, '1982-03-10', 'delivery', 'Active'),
+(4, 2, '1995-07-05', 'hr', 'Inactive'),
+(5, 3, '1978-12-25', 'delivery', 'Active'),
+(6, 3, '1992-06-06','hr','Inactive');
+go;
 SELECT 
-    service,
-    AVG(DATEDIFF(YEAR, dob, GETDATE())) AS avg_age,
-    MAX(DATEDIFF(YEAR, dob, GETDATE())) AS max_age,
-    MIN(DATEDIFF(YEAR, dob, GETDATE())) AS min_age
+    c.Center_Name,e.Service_Type,
+    e.Service_Status,
+    MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Max_Age_Years,
+    MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS Min_Age_Years,
+    CONCAT(
+        CAST(MAX(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
+        CAST(MAX(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
+    ) AS Max_Age,
+    CONCAT(
+        CAST(MIN(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())) AS NVARCHAR(10)), ' years ',
+        CAST(MIN(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12) AS NVARCHAR(10)), ' months'
+    ) AS Min_Age,
+    CONCAT(
+        CAST(ROUND(AVG(DATEDIFF(YEAR, e.Date_of_Birth, GETDATE())), 2) AS NVARCHAR(10)), ' years ',
+        CAST(ROUND(AVG(DATEDIFF(MONTH, e.Date_of_Birth, GETDATE()) % 12.0), 2) AS NVARCHAR(10)), ' months'
+    ) AS Avg_Age
+   
 FROM 
-    employeedone
+    employees e
+JOIN 
+    centers c ON e.Center_ID = c.Center_ID
 GROUP BY 
-    center;
+    cube(c.Center_Name, e.Service_Type, e.Service_Status);
+go
 
 /*5)Write a query to list out all the employees where any of the words (Excluding Initials) in the Name starts and ends with the same
 character. (Assume there are not more than 5 words in any name )*/
