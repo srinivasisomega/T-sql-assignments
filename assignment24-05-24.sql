@@ -54,9 +54,7 @@ error as (emo_id/0))
 insert into erothrow values(1,'vvsvsv'),(2,'esbdbdddb');
 select*from erothrow;
 select emo_id,srido from erothrow
---creating a fuction to throw spefic error message(...pending)
-vvyuu
-   
+
 --Display Calendar Table based on the input year.
 DECLARE @StartDate date = '20240101';
 DECLARE @enddate date = DATEADD(DAY, -1, DATEADD(YEAR, 1, @StartDate));

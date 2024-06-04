@@ -1,3 +1,5 @@
+drop database EMPID#266
+create database EMPID#266
 use EMPID#266
 /*1)Select all departments in all locations where the Total Salary of a Department is Greater than twice the Average Salary for the department.
 And max basic for the department is at least thrice the Min basic for the department*/
