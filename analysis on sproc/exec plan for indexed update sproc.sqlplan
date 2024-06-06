@@ -1,0 +1,93 @@
+<ShowPlanXML xmlns="http://schemas.microsoft.com/sqlserver/2004/07/showplan" Version="1.539" Build="15.0.2000.5">
+  <BatchSequence>
+    <Batch>
+      <Statements>
+        <StmtSimple StatementText="UPDATE Employeeji SET &#xD;&#xA;    Name = @Name, &#xD;&#xA;    Gender = @Gender,&#xD;&#xA;    DOB = @DOB, &#xD;&#xA;    DeptID = @DeptID&#xD;&#xA;WHERE ID = @ID" StatementId="1" StatementCompId="3" StatementType="UPDATE" RetrievedFromCache="true" StatementSubTreeCost="0.0132841" StatementEstRows="1" SecurityPolicyApplied="false" StatementOptmLevel="TRIVIAL" QueryHash="0x0C49963AF58CB9FC" QueryPlanHash="0xA5CCD35BCCBCA3F5" CardinalityEstimationModelVersion="150">
+          <StatementSetOptions QUOTED_IDENTIFIER="true" ARITHABORT="true" CONCAT_NULL_YIELDS_NULL="true" ANSI_NULLS="true" ANSI_PADDING="true" ANSI_WARNINGS="true" NUMERIC_ROUNDABORT="false"></StatementSetOptions>
+          <QueryPlan DegreeOfParallelism="1" CachedPlanSize="16" CompileTime="1" CompileCPU="1" CompileMemory="224">
+            <MemoryGrantInfo SerialRequiredMemory="0" SerialDesiredMemory="0" GrantedMemory="0" MaxUsedMemory="0"></MemoryGrantInfo>
+            <OptimizerHardwareDependentProperties EstimatedAvailableMemoryGrant="207391" EstimatedPagesCached="51847" EstimatedAvailableDegreeOfParallelism="2" MaxCompileMemory="2265272"></OptimizerHardwareDependentProperties>
+            <OptimizerStatsUsage>
+              <StatisticsInfo LastUpdate="2024-06-06T12:54:05.16" ModificationCount="0" SamplingPercent="100" Statistics="[bbk555]" Table="[Employeeji]" Schema="[dbo]" Database="[EMPID#266]"></StatisticsInfo>
+            </OptimizerStatsUsage>
+            <QueryTimeStats ElapsedTime="0" CpuTime="0"></QueryTimeStats>
+            <RelOp NodeId="0" PhysicalOp="Clustered Index Update" LogicalOp="Update" EstimateRows="1" EstimateIO="0.01" EstimateCPU="1e-06" AvgRowSize="9" EstimatedTotalSubtreeCost="0.0132841" Parallel="0" EstimateRebinds="0" EstimateRewinds="0" EstimatedExecutionMode="Row">
+              <OutputList></OutputList>
+              <RunTimeInformation>
+                <RunTimeCountersPerThread Thread="0" ActualRows="1" Batches="0" ActualExecutionMode="Row" ActualElapsedms="0" ActualCPUms="0" ActualScans="1" ActualLogicalReads="2" ActualPhysicalReads="0" ActualReadAheads="0" ActualLobLogicalReads="0" ActualLobPhysicalReads="0" ActualLobReadAheads="0" ActualRowsRead="1" ActualEndOfScans="1" ActualExecutions="1"></RunTimeCountersPerThread>
+              </RunTimeInformation>
+              <SimpleUpdate DMLRequestSort="0">
+                <Object Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Index="[bbk555]" IndexKind="Clustered" Storage="RowStore"></Object>
+                <SeekPredicateNew>
+                  <SeekKeys>
+                    <Prefix ScanType="EQ">
+                      <RangeColumns>
+                        <ColumnReference Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Column="ID"></ColumnReference>
+                      </RangeColumns>
+                      <RangeExpressions>
+                        <ScalarOperator ScalarString="[@ID]">
+                          <Identifier>
+                            <ColumnReference Column="@ID"></ColumnReference>
+                          </Identifier>
+                        </ScalarOperator>
+                      </RangeExpressions>
+                    </Prefix>
+                  </SeekKeys>
+                </SeekPredicateNew>
+                <SetPredicate>
+                  <ScalarOperator ScalarString="[EMPID#266].[dbo].[Employeeji].[Name] = [@Name],[EMPID#266].[dbo].[Employeeji].[Gender] = [@Gender],[EMPID#266].[dbo].[Employeeji].[DOB] = [@DOB],[EMPID#266].[dbo].[Employeeji].[DeptID] = [@DeptID]">
+                    <ScalarExpressionList>
+                      <ScalarOperator>
+                        <MultipleAssign>
+                          <Assign>
+                            <ColumnReference Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Column="Name"></ColumnReference>
+                            <ScalarOperator>
+                              <Identifier>
+                                <ColumnReference Column="@Name"></ColumnReference>
+                              </Identifier>
+                            </ScalarOperator>
+                          </Assign>
+                          <Assign>
+                            <ColumnReference Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Column="Gender"></ColumnReference>
+                            <ScalarOperator>
+                              <Identifier>
+                                <ColumnReference Column="@Gender"></ColumnReference>
+                              </Identifier>
+                            </ScalarOperator>
+                          </Assign>
+                          <Assign>
+                            <ColumnReference Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Column="DOB"></ColumnReference>
+                            <ScalarOperator>
+                              <Identifier>
+                                <ColumnReference Column="@DOB"></ColumnReference>
+                              </Identifier>
+                            </ScalarOperator>
+                          </Assign>
+                          <Assign>
+                            <ColumnReference Database="[EMPID#266]" Schema="[dbo]" Table="[Employeeji]" Column="DeptID"></ColumnReference>
+                            <ScalarOperator>
+                              <Identifier>
+                                <ColumnReference Column="@DeptID"></ColumnReference>
+                              </Identifier>
+                            </ScalarOperator>
+                          </Assign>
+                        </MultipleAssign>
+                      </ScalarOperator>
+                    </ScalarExpressionList>
+                  </ScalarOperator>
+                </SetPredicate>
+              </SimpleUpdate>
+            </RelOp>
+            <ParameterList>
+              <ColumnReference Column="@DeptID" ParameterDataType="int" ParameterCompiledValue="(3)" ParameterRuntimeValue="(3)"></ColumnReference>
+              <ColumnReference Column="@DOB" ParameterDataType="datetime" ParameterCompiledValue="'1994-06-17 10:53:27.060'" ParameterRuntimeValue="'1994-06-17 10:53:27.060'"></ColumnReference>
+              <ColumnReference Column="@Gender" ParameterDataType="varchar(50)" ParameterCompiledValue="'Female'" ParameterRuntimeValue="'Female'"></ColumnReference>
+              <ColumnReference Column="@Name" ParameterDataType="varchar(50)" ParameterCompiledValue="'Palak'" ParameterRuntimeValue="'Palak'"></ColumnReference>
+              <ColumnReference Column="@ID" ParameterDataType="int" ParameterCompiledValue="(3)" ParameterRuntimeValue="(3)"></ColumnReference>
+            </ParameterList>
+          </QueryPlan>
+        </StmtSimple>
+      </Statements>
+    </Batch>
+  </BatchSequence>
+</ShowPlanXML>
