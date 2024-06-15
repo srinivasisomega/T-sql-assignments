@@ -1,0 +1,103 @@
+use EMPID#266;
+select * from emp_department
+create table emp_department(
+dpt_code int
+, dpt_name varchar(20)
+, dpt_allotment int
+,  primary key(dpt_code))
+insert into emp_department values
+( 57,'IT',65000),
+(63,'Finance',15000),
+(47,'HR', 240000),
+(27,'RD', 55000),
+(89,'QC',75000)
+create table emp_details(
+emp_idno int,
+emp_fname varchar(20),
+emp_lname varchar(20),
+emp_dept int,
+primary key(emp_idno),
+foreign key(emp_dept) references emp_department(dpt_code))
+insert into emp_details values
+(127323,'Michale','Robbin',57)
+,(526689,'Carlos','Snares',63),
+(843795, 'Enric', 'Dosio', 57),
+(328717, 'Jhon', 'Snares', 63),
+(444527, 'Joseph', 'Dosni', 47),
+(659831, 'Zanifer', 'Emily', 47),
+(847674, 'Kuleswar', 'Sitaraman', 57),
+(748681, 'Henrey', 'Gabriel', 47),
+(555935, 'Alex', 'Manuel', 57),
+(539569, 'George', 'Mardy', 27),
+(733843, 'Mario', 'Saule', 63),
+(631548, 'Alan', 'Snappy', 27),
+(839139, 'Maria', 'Foster', 57);
+--8)1st method
+with second_lowest 
+as
+(select top(1) dpt_code 
+from emp_department
+where dpt_allotment > (select top(1) dpt_allotment from emp_department order by dpt_allotment)
+order by dpt_allotment)
+select e.emp_fname, e.emp_lname from 
+emp_details as e
+join
+second_lowest as s
+on
+e.emp_dept =s.dpt_code
+where e.emp_dept = s.dpt_code
+--8)2nd method
+with cte as(
+select *,
+dense_rank() OVER (order by dpt_allotment) as dept_rank 
+from emp_department 
+)
+SELECT 
+    e.emp_fname,
+    e.emp_lname
+FROM 
+    emp_details e
+JOIN 
+    cte c ON e.emp_dept = c.dpt_code
+WHERE 
+    dept_rank = 2;
+--2nd q
+drop table city
+drop table country
+create table city(id int,name varchar(25),ccode varchar(3) foreign key references country(ccode),pop int);
+create table country(ccode varchar(3) primary key,continent varchar(20));
+-- Inserting data into the city table
+INSERT INTO city (id, name, ccode, pop) VALUES
+    (1, 'New York', 'USA', 8175133),
+    (2, 'Los Angeles', 'USA', 3792621),
+    (3, 'London', 'GBR', 8787892),
+    (4, 'Paris', 'FRA', 2140526),
+    (5, 'Tokyo', 'JPN', 9273000),
+    (6, 'Beijing', 'CHN', 21540000),
+    (7, 'Sydney', 'AUS', 5312160),
+    (8, 'Rio de Janeiro', 'BRA', 6320446),
+    (9, 'Cairo', 'EGY', 9500000),
+    (10, 'Mumbai', 'IND', 12442373);
+INSERT INTO country (ccode, continent) VALUES
+    ('USA', 'North America'),
+    ('GBR', 'Europe'),
+    ('FRA', 'Europe'),
+    ('JPN', 'Asia'),
+    ('CHN', 'Asia'),
+    ('AUS', 'Australia'),
+    ('BRA', 'South America'),
+    ('EGY', 'Africa'),
+    ('IND', 'Asia');
+--1 method
+select c.continent,round(avg(ci.pop),2)
+from country as c
+join
+city as ci
+on
+c.ccode = ci.ccode
+group by c.continent
+--6)1)method
+with emp as(
+select (purch_amt+1000) as req from Orders;
+)
+select orderdate,sum(purch_amt) as alls from Orders as o join emp as e group by Orderdate having alls>e.req;
